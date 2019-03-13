@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:contextp="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd "
+>
+    <!--配置数据库相关参数-->
+    <!--1.加载jdbc需要的四个参数， 在properties中，可以用${driver}来取得去驱动的值-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+    <!--2.数据库连接池  c3p0-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!--配置连接池属性-->
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!--连接池的私有属性-->
+        <!--最大数据连接，默认15个-->
+        <property name="maxPoolSize" value="30"/>
+        <!--最小数据连接，默认3个-->
+        <property name="minPoolSize" value="10"/>
+        <!--关闭连接后是否自动提交，默认false-->
+        <property name="autoCommitOnClose" value="false"/>
+        <!--默认超时为无限等待-->
+        <!--<property name="checkoutTimeout" value="1000"/>-->
+        <!--获取失败后重试几次-->
+        <property name="acquireRetryAttempts" value="2"/>
+    </bean>
+
+    <!--配置sqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置mybatis全局配置文件 mybatis-config.xml -->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <!--扫描entity,可以不用在mapper写全名 如果俩个就value="org.seckill.entity;org.seckill.entity1"-->
+        <property name="typeAliasesPackage" value="com.macky.fileShareSystem.entity"/>
+        <!--扫描mapper文件-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+
+    <!--配置扫描DAO接口的包，动态实现DAO接口，并且注入到spring容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--注入sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--给出扫描DAO接口的包-->
+        <property name="basePackage" value="com.macky.fileShareSystem.dao"></property>
+    </bean>
+</beans>

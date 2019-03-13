@@ -1,0 +1,49 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macky.fileShareSystem.dao.DesignTemplateDao">
+    <select id="listDesignTemplate" parameterType="string" resultType="com.macky.fileShareSystem.vo.TemplateRecordVO">
+        SELECT
+            `t_id`,
+            `t_file_id`,
+            `t_time`,
+            `t_user`,
+            `t_remark`,
+            `t_state`,
+            `business_id`,
+            `busi_con_id`,
+            `enclosure_name`,
+            `enclosure_path`,
+            `enclosure_order`,
+            `file_size`,
+            `ext_name`
+        FROM t_design_enclosure, t_design_template
+        <where>
+            t_file_id = busi_con_id
+            <if test="state != null">AND t_state=#{state}</if>
+        </where>
+    </select>
+
+    <insert id="saveDesignTemplate" parameterType="com.macky.fileShareSystem.entity.DesignTemplate">
+        INSERT INTO
+            t_design_template (`t_id`, `t_file_id`, `t_time`, `t_user`,
+                               `t_remark`, `t_state`)
+        VALUES (#{tid}, #{tfileId}, #{ttime}, #{tuser}, #{tremark}, #{tstate})
+    </insert>
+
+    <insert id="saveDesignEnclosure" parameterType="com.macky.fileShareSystem.entity.DesignEnclosure">
+        INSERT INTO
+            t_design_enclosure (`enclosure_id`, `business_id`, `busi_con_id`,
+                                `enclosure_name`, `enclosure_path`,
+                                `enclosure_order`, `file_size`, `ext_name`)
+        VALUES (#{enclosureId}, #{businessId}, #{busiConId},
+                #{enclosureName}, #{enclosurePath}, #{enclosureOrder},
+                #{fileSize}, #{extName})
+    </insert>
+
+    <update id="updateTemplateState">
+        UPDATE t_design_template
+        SET t_state = #{state}
+        WHERE t_id = #{tid}
+    </update>
+</mapper>

@@ -1,0 +1,74 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macky.fileShareSystem.dao.SharedFileDao">
+    <select id="listFileByUser" resultType="com.macky.fileShareSystem.entity.SharedFile">
+        SELECT
+            `f_id`,
+            `file_name`,
+            `file_size`,
+            `file_path`,
+            `ext_name`,
+            `f_state`,
+            `f_user`,
+            `create_time`,
+            `f_username`
+        FROM shared_file
+        WHERE f_user = #{userId}
+              AND f_state != 0
+    </select>
+
+    <select id="listFileByShared" resultType="com.macky.fileShareSystem.entity.SharedFile">
+        SELECT
+            `f_id`,
+            `file_name`,
+            `file_size`,
+            `file_path`,
+            `ext_name`,
+            `f_state`,
+            `f_user`,
+            `create_time`,
+            `f_username`
+        FROM shared_file
+        WHERE f_state = 2
+    </select>
+
+    <insert id="saveFile">
+        INSERT INTO
+            shared_file
+            (`f_id`, `file_name`, `file_size`, `file_path`,
+             `ext_name`, `f_state`, `f_user`, `create_time`,
+             `f_username`)
+        VALUES (#{fId}, #{fileName}, #{fileSize}, #{filePath},
+                #{extName}, #{fState}, #{fUser}, #{createTime},
+                #{fUsername})
+    </insert>
+
+    <update id="updateFileState">
+        UPDATE shared_file
+        SET `f_state` = #{state}
+        WHERE f_id = #{id}
+    </update>
+
+    <select id="countUserFile" resultType="integer">
+        SELECT count(1)
+        FROM `shared_file`
+        WHERE f_user = #{userId}
+        AND f_state != 0
+    </select>
+
+    <select id="countUserSharedFile" resultType="integer">
+        SELECT count(1)
+        FROM `shared_file`
+        WHERE f_user = #{userId}
+        AND f_state = 2
+        AND f_state != 0
+    </select>
+
+    <select id="countSharedFile" resultType="integer">
+        SELECT count(1)
+        FROM `shared_file`
+        WHERE f_state = 2
+        AND f_state != 0
+    </select>
+</mapper>
